@@ -119,6 +119,17 @@ void Set_Steering(unsigned char data1,unsigned char data2)
     write(fd_UART1, &param2, 1);
     usleep(100000);
 }
+// 조향 장치 속도 제어 // 0~ 100; 
+
+void Set_SteeringSpeed(unsigned char data)
+{
+    unsigned char op = 0xf5;
+    unsigned char param =(data & data);
+    write(fd_UART1, &op, 1);
+    write(fd_UART1, &param, 1);
+    usleep(100000);
+}
+
 
 int Get_wheel_value(void)
 {
@@ -143,7 +154,9 @@ int Get_wheel_value(void)
             else if(test[8]=='.'){wheel=(test[5]-48)*100+(test[6]-48)*10+(test[7]-48);}
             else ;
         }
-        else if(test[4]=='1'){}
+        else if(test[4]=='1')
+        {
+        }
     }
 
     else if(test[0]=='b')
@@ -161,6 +174,7 @@ void main()
     unsigned int v;
     unsigned int st1,st2;
     UART1_Open();
+   Set_SteeringSpeed(100);
     while(1){
     v=Get_wheel_value();
     //printf("%d\n",v);
