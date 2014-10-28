@@ -146,16 +146,15 @@ int Get_wheel_value(void)
     //printf("%s\n",test);
    
     if(test[0]=='a')
-    {
-        if(test[4]=='0')
-        {
+    {   
             if(test[6]=='.'){wheel=(test[5]-48);}
             else if(test[7]=='.'){wheel=(test[5]-48)*10+(test[6]-48);}
             else if(test[8]=='.'){wheel=(test[5]-48)*100+(test[6]-48)*10+(test[7]-48);}
             else ;
-        }
-        else if(test[4]=='1')
+        
+        if(test[4]=='1')
         {
+            wheel =wheel+1000;
         }
     }
 
@@ -168,6 +167,8 @@ int Get_wheel_value(void)
     fclose(f);    
     return wheel;
 }
+
+
 
 void main()
 {
@@ -194,6 +195,16 @@ void main()
         Set_Steering(st1,st2);
         //printf("%d\n",v);
     }
+    else if(v>=1000)
+    {   v=v-1000;
+        printf("%d\n",v);
+        Set_Accel(v);
+        v=v*31;
+        Set_Speed(((0xff00&v)>>8),(0x00ff&v));
+        Set_Distance(0xFF, 0xFF); 
+        Go_Distance_Forward(); 
+    }
+
 
     }
     //Get_wheel_value();
