@@ -6,7 +6,8 @@
 #include <sys/signal.h>
 #include <linux/ioctl.h>
 
-#define BAUDRATE_UART1 B19200		
+#define BAUDRATE_UART1 B4800 // 2014 년 이후
+//#define BAUDRATE_UART1 B19200 // 2014 년 이전 		
 #define DEVICE_UART1 "/dev/ttyUSB0"
 #define BUFF_SIZE 1024
 int fd_UART1;
@@ -168,6 +169,66 @@ int Get_wheel_value(void)
     return wheel;
 }
 
+/**********2014 년 이후 코드 (새로온 자동차에 적용)****************/
+
+void Newset_steering(unsigned char data1, unsigned char data2)
+{
+    unsigned char op = 0xA3;
+    unsigned char length = 0x04;
+    unsigned char RW = 0x01;
+    unsigned char param1 = (data2 & data2);
+    unsigned char param2 = (data1 & data1);
+    unsigned int checkSum =((op+length+RW+param1+param2)&0x00ff);
+    checkSum = (unsigned char)checkSum; 
+    write(fd_UART1, &op, 1);
+    write(fd_UART1, &length, 1);
+    write(fd_UART1, &RW, 1);
+    write(fd_UART1, &param1, 1);
+    write(fd_UART1, &param2, 1);
+    write(fd_UART1, &checkSum, 1);
+    usleep(100000);
+}
+
+
+void Newset_speed(unsigned char data1, unsigned char data2)
+{
+    unsigned char op = 0x91;
+    unsigned char length = 0x04;
+    unsigned char RW = 0x01;
+    unsigned char param1 = (data2 & data2);
+    unsigned char param2 = (data1 & data1);
+    unsigned int checkSum =((op+length+RW+param1+param2)&0x00ff);
+    checkSum = (unsigned char)checkSum; 
+    write(fd_UART1, &op, 1);
+    write(fd_UART1, &length, 1);
+    write(fd_UART1, &RW, 1);
+    write(fd_UART1, &param1, 1);
+    write(fd_UART1, &param2, 1);
+    write(fd_UART1, &checkSum, 1);
+    usleep(100000);
+}
+
+void Newset_distance(unsigned char data1, unsigned char data2, unsigned char data3, unsigned char data4)
+{
+    unsigned char op = 0x97;
+    unsigned char length = 0x06;
+    unsigned char RW = 0x01;
+    unsigned char param1 = (data4 & data4);
+    unsigned char param2 = (data3 & data3);
+    unsigned char param3 = (data2 & data2);
+    unsigned char param4 = (data1 & data1);
+    unsigned int checkSum =((op+length+RW+param1+param2+param3+param4)&0x00ff);
+    checkSum = (unsigned char)checkSum; 
+    write(fd_UART1, &op, 1);
+    write(fd_UART1, &length, 1);
+    write(fd_UART1, &RW, 1);
+    write(fd_UART1, &param1, 1);
+    write(fd_UART1, &param2, 1);
+    write(fd_UART1, &param3, 1);
+    write(fd_UART1, &param4, 1);
+    write(fd_UART1, &checkSum, 1);
+    usleep(100000);
+}
 
 
 void main()
@@ -175,7 +236,7 @@ void main()
     unsigned int v;
     unsigned int st1,st2;
     UART1_Open();
-   Set_SteeringSpeed(100);
+    //Set_SteeringSpeed(100);
     while(1){
     v=Get_wheel_value();
     //printf("%d\n",v);
@@ -184,7 +245,8 @@ void main()
         v= (v*5)+1500;
         st1=((v & 0xff00)>>8);
         st2=(v & 0x00ff);
-        Set_Steering(st1,st2);
+        Newset_steering(st1,st2);
+        //Set_Steering(st1,st2);
         //printf("%d,%d\n",st1,st2);
     }
     else if(v>128&&v<=255)
@@ -192,17 +254,21 @@ void main()
         v=1500-(255-v)*5;
         st1=((v & 0xff00)>>8);
         st2=(v & 0x00ff);
-        Set_Steering(st1,st2);
+        Newset_steering(st1,st2);
+        //Set_Steering(st1,st2);
         //printf("%d\n",v);
     }
     else if(v>=1000)
     {   v=v-1000;
         printf("%d\n",v);
         Set_Accel(v);
-        v=v*31;
-        Set_Speed(((0xff00&v)>>8),(0x00ff&v));
-        Set_Distance(0xFF, 0xFF); 
-        Go_Distance_Forward(); 
+        //v=v*31;
+        v=v*4;
+        Newset_speed(((0xff00&v)>>8),(0x00ff&v));
+        Newset_distance(0x00,0x00,0xff,0xff);
+        //Set_Speed(((0xff00&v)>>8),(0x00ff&v));
+        //Set_Distance(0xFF, 0xFF); 
+        //Go_Distance_Forward(); 
     }
 
 
