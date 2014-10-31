@@ -1,0 +1,25 @@
+1. get wiringPi
+# git clone https://github.com/WiringPi/WiringPi.git
+
+2. remove console command
+# vim /boot/cmdline.txt
+- and remove 'console=ttyAMA0,115200'
+- and save 
+
+3. add annotation in inittab
+# vim /etc/inittab
+- end of the line is : T0:23raspawn:/sbin/getty -L ttyAMA0 115200 vt100
+- change like this : # T0:23raspawn:/sbin/getty -L ttyAMA0 115200 vt100
+
+4. reboot 
+# sudo reboot
+
+
+
+
+
+
+
+
+
+
