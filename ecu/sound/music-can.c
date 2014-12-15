@@ -10,7 +10,7 @@ void audioPlayer(char CMD)
 {
 
     static char str[100];
-    char *aplay ="sudo aplay /home/pi/automotive_emulation/ecu/sound";
+    char *aplay ="sudo aplay /home/pi/automotive_emulation/ecu/sound/";
     char *listOfMusic[]={"kiki.wav","inno.wav","you.wav"};
     strcpy(str,aplay);
     strcat(str,listOfMusic[musicNumber]);
